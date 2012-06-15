@@ -24,6 +24,7 @@ build-common {
 		if ""${PLAT}"" equ ""x64"" (
 			nmake /f NT_X64_THREADS_MAKEFILE || goto failed
 			mkdir ${OUTDIR}
+			copy gc64_dll.dll ${OUTDIR}
 			rename gc64_dll.dll gc.dll
 			move gc.dll ${OUTDIR}
 			rename gc64_dll.lib gc.lib
@@ -80,4 +81,38 @@ x64-vc10 {
 release {
 	uses: x86-vc10;
 	uses: x64-vc10;
+}
+
+test-common {
+	uses: build-common;
+
+	set : { OUTDIR="output-${PLAT}-${COMP}" }
+
+	build-command: @"
+		cd ${OUTDIR}
+		gctest.exe || goto failed
+	";
+}
+
+test-x86-vc10 {
+	set : {
+		COMP="vc10";
+		PLAT="x86";
+	}
+
+	uses: test-common;
+}
+
+test-x64-vc10 {
+	set : {
+		COMP="vc10";
+		PLAT="x64";
+	}
+
+	uses: test-common;
+}
+
+test {
+	uses: test-x86-vc10;
+	uses: test-x64-vc10;
 }
