@@ -1,0 +1,83 @@
+@import "version.inc";
+
+#define {
+    NewVersion : "${package-version++}";
+}
+
+#product-info  {
+    product-name: "boehm-gc";
+    version: "${package-version}";
+    original-source-location: "http://www.hpl.hp.com/personal/Hans_Boehm/gc/gc_source/gc-7.1.tar.gz";
+    original-source-website: "http://www.hpl.hp.com/personal/Hans_Boehm/gc/";
+    license: "custom, see README.QUICK";
+    packager: "Vincent Povirk <madewokherd@gmail.com>";
+}
+
+build-common {
+	platform: "${PLAT}";
+	compiler: "${COMP}";
+
+	set : { OUTDIR="output-${PLAT}-${COMP}" }
+
+	build-command: @"
+		if ""${BUILT}"" equ ""true"" goto end
+		if ""${PLAT}"" equ ""x64"" (
+			nmake /f NT_X64_THREADS_MAKEFILE || goto failed
+			mkdir ${OUTDIR}
+			rename gc64_dll.dll gc.dll
+			move gc.dll ${OUTDIR}
+			rename gc64_dll.lib gc.lib
+			move gc.lib ${OUTDIR}
+			move gctest.exe ${OUTDIR}
+		) else (
+			rd /s /q Release
+			rd /s /q gctest
+			nmake /f NT_THREADS_MAKEFILE || goto failed
+			rd /s /q ${OUTDIR}
+			rename Release ${OUTDIR}
+			rd /s /q gctest
+			del test.c
+		)
+:end
+	";
+
+	targets: {
+		@"${OUTDIR}\gc.dll",
+		@"${OUTDIR}\gc.lib",
+		@"${OUTDIR}\gctest.exe",
+	};
+
+	clean-command: @"
+		rd /s /q ${OUTDIR}
+		del test.c
+		if ""${PLAT}"" equ ""x64"" (
+			nmake /f NT_X64_THREADS_MAKEFILE clean
+			del cord\*.exe cord\*.obj cord\*.pdb cord\*.rbj cord\*.res *.pdb *.exp test_cpp.* tests\test.obj
+		) else (
+			nmake /f NT_THREADS_MAKEFILE clean
+		)
+	";
+}
+
+x86-vc10 {
+	set : {
+		COMP="vc10";
+		PLAT="x86";
+	}
+
+	uses: build-common;
+}
+
+x64-vc10 {
+	set : {
+		COMP="vc10";
+		PLAT="x64";
+	}
+
+	uses: build-common;
+}
+
+release {
+	uses: x86-vc10;
+	uses: x64-vc10;
+}
