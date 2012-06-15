@@ -24,10 +24,7 @@ build-common {
 		if ""${PLAT}"" equ ""x64"" (
 			nmake /f NT_X64_THREADS_MAKEFILE || goto failed
 			mkdir ${OUTDIR}
-			copy gc64_dll.dll ${OUTDIR}
-			rename gc64_dll.dll gc.dll
 			move gc.dll ${OUTDIR}
-			rename gc64_dll.lib gc.lib
 			move gc.lib ${OUTDIR}
 			move gctest.exe ${OUTDIR}
 		) else (
@@ -87,6 +84,10 @@ test-common {
 	uses: build-common;
 
 	set : { OUTDIR="output-${PLAT}-${COMP}" }
+
+	targets: {
+		@"${OUTDIR}\gctest.exe.log",
+	};
 
 	build-command: @"
 		cd ${OUTDIR}
