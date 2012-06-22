@@ -1,0 +1,57 @@
+@import "version.inc";
+@import "compat.inc";
+@import "outercurve.inc";
+
+#define { 
+    flavor: "${comp??vc10}"; 
+    arch : "${plat??x86}";
+}
+
+package {
+    name: "boehm-gc-dev[${flavor}]";
+    version: "${package-version}";
+    arch : "${arch}";
+
+    display-name: "Boehm GC Dev";
+    location: "http://coapp.org/repository/${OutputFilename}";
+
+    feed: "http://coapp.org/repository/packages.atom.xml";
+    publisher: "CoApp Project";
+}
+
+license[boehm-gc] {
+    license-url: "http://www.hpl.hp.com/personal/Hans_Boehm/gc/license.txt";
+    license-type: "Boehm GC";
+}
+
+metadata {
+    summary: "Boehm GC"; // or a more user-friendly name
+    description: @"A conservative garbage collector for C and C++.";
+    author-version : "${author-version}";
+    bug-tracker: "https://github.com/coapp-packages/MyPackage/boehm-gc";
+    stability : "0";
+    licenses : {
+        boehm-gc
+    };
+}
+
+requires {
+    package: "boehm-gc[${flavor}]-${package-version}-${Package.Architecture}-${Package.PublicKeyToken}";
+    package: "boehm-gc-dev-common-${package-version}-any-${Package.PublicKeyToken}";
+}
+
+developer-library[boehm-gc[${flavor}]] {
+    libraries : {
+        libs,
+    };
+}
+
+files[libs] {
+    root: @"..\output-${arch}-${flavor}";
+
+    include: {
+        "gc.lib",
+    };
+
+    trim-path: all;
+};

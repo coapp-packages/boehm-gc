@@ -1,0 +1,48 @@
+@import "version.inc";
+@import "compat.inc";
+@import "outercurve.inc";
+
+package {
+    name: "boehm-gc-dev-common";
+    version: "${package-version}";
+    arch : "any";
+
+    display-name: "Boehm GC Dev Common";
+    location: "http://coapp.org/repository/${OutputFilename}";
+
+    feed: "http://coapp.org/repository/packages.atom.xml";
+    publisher: "CoApp Project";
+}
+
+license[boehm-gc] {
+    license-url: "http://www.hpl.hp.com/personal/Hans_Boehm/gc/license.txt";
+    license-type: "Boehm GC";
+}
+
+metadata {
+    summary: "Boehm GC"; // or a more user-friendly name
+    description: @"A conservative garbage collector for C and C++.";
+    author-version : "${author-version}";
+    bug-tracker: "https://github.com/coapp-packages/MyPackage/boehm-gc";
+    stability : "0";
+    licenses : {
+        boehm-gc
+    };
+}
+
+developer-library[boehm-gc] {
+    headers: {
+        headers
+    };
+}
+
+files[headers] {
+    root: @"..\include";
+	destination: "gc";
+    include: {
+        @"*.h",
+		@"extra\*.h",
+    };
+
+    trim-path:none;
+}

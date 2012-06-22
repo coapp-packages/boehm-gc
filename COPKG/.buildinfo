@@ -117,3 +117,42 @@ test {
 	uses: test-x86-vc10;
 	uses: test-x64-vc10;
 }
+
+package {
+	uses: release;
+
+	build-command: @"
+        if ""${noversion}"" neq ""true"" ptk update-version
+        cd COPKG
+        autopackage boehm-gc-dev-common.autopkg || goto failed
+        autopackage boehm-gc.autopkg boehm-gc-dev.autopkg --comp=vc10 --plat=x86 || goto failed
+        autopackage boehm-gc.autopkg boehm-gc-dev.autopkg --comp=vc10 --plat=x64 || goto failed
+	";
+
+	targets: {
+		@"COPKG\boehm-gc[vc10]-${NewVersion}-x86.msi",
+		@"COPKG\boehm-gc[vc10]-${NewVersion}-x64.msi",
+		@"COPKG\boehm-gc-dev[vc10]-${NewVersion}-x86.msi",
+		@"COPKG\boehm-gc-dev[vc10]-${NewVersion}-x64.msi",
+		@"COPKG\boehm-gc-dev-common-${NewVersion}-any.msi",
+	};
+
+	clean-command: @"
+		del COPKG\*.msi
+		del COPKG\*.wixpdb
+	";
+}
+
+update-version {
+    default : false;
+    
+    build-command : @"
+        REM auto-increment version.inc file...
+        
+        pushd COPKG
+        setlocal EnableDelayedExpansion
+        set VERSTRING=#define { package-version: ${NewVersion}; }
+        echo !VERSTRING! > version.inc
+        popd
+    ";
+}
