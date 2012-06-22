@@ -1,7 +1,7 @@
-#define { author-version: "2.2.0"; }
+#define { author-version: "7.1"; }
 
 compatability-policy {
-    minimum: "2.2.0.2";
+    minimum: "7.1.0.0";
     maximum: "${OneLessThanCurrent}";
     versions : {
     };
